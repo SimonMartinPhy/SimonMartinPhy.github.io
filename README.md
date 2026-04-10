@@ -272,13 +272,22 @@ const SAD = 100; // Distance Source-Axe (isocentre), cm
  *  sFS  : augmentation de Ds par cm d'augmentation de FS
  */
 const BEAM = {
-    '4': { dmax: 1.0, mu: 0.0560, Ds: 0.40, dFS: 0.006, sFS: 0.004, sig0: 0.28, horn:  0.03 },
-    '6': { dmax: 1.5, mu: 0.0510, Ds: 0.32, dFS: 0.009, sFS: 0.006, sig0: 0.35, horn:  0.05 },
-  '6fff': { dmax: 1.4, mu: 0.0505, Ds: 0.50, dFS: 0.007, sFS: 0.005, sig0: 0.36, horn: 0, sigma_fff: 10, fff: true },
-   '10': { dmax: 2.5, mu: 0.0450, Ds: 0.20, dFS: 0.011, sFS: 0.006, sig0: 0.42, horn:  0.08 },
-'10fff': { dmax: 2.4, mu: 0.0445, Ds: 0.60, dFS: 0.011, sFS: 0.005, sig0: 0.43, horn: 0, sigma_fff: 8, fff: true },
-   '15': { dmax: 3.0, mu: 0.0400, Ds: 0.15, dFS: 0.012, sFS: 0.005, sig0: 0.48, horn:  0.11 },
-   '18': { dmax: 3.5, mu: 0.0380, Ds: 0.12, dFS: 0.013, sFS: 0.004, sig0: 0.53, horn:  0.13 },
+  //  dmax  : profondeur de dose max FS=10×10, SSD=100 (cm)
+  //  mu    : coeff. atténuation effectif recalibré sur PDD(10) réel TrueBeam (cm⁻¹)
+  //  Ds    : dose de surface FS=10×10 (fraction de Dmax) — source Fogliata Fig.6 / données standards
+  //  dFS   : variation de dmax par cm de FS (cm/cm) — FF uniquement
+  //  sFS   : variation de Ds par cm de FS
+  //  sig0  : sigma pénombre à d=0, FS=10 (cm)
+  //  horn  : coefficient de cornes FF (>0 → cornes, 0 pour FFF)
+  //  sigma_fff : largeur demi-max Lorentzienne ramenée au plan source (cm)
+  //              recalibré sur les facteurs de renormalisation Table I Fogliata 2012
+    '4': { dmax: 1.0, mu: 0.0420, Ds: 0.40, dFS: 0.006, sFS: 0.004, sig0: 0.28, horn:  0.03 },
+    '6': { dmax: 1.5, mu: 0.0330, Ds: 0.32, dFS: 0.009, sFS: 0.006, sig0: 0.35, horn:  0.05 },
+  '6fff': { dmax: 1.4, mu: 0.0360, Ds: 0.65, dFS: 0.007, sFS: 0.005, sig0: 0.36, horn: 0, sigma_fff: 20, fff: true },
+   '10': { dmax: 2.5, mu: 0.0260, Ds: 0.20, dFS: 0.011, sFS: 0.006, sig0: 0.42, horn:  0.08 },
+'10fff': { dmax: 2.4, mu: 0.0280, Ds: 0.42, dFS: 0.011, sFS: 0.005, sig0: 0.43, horn: 0, sigma_fff: 14, fff: true },
+   '15': { dmax: 3.0, mu: 0.0190, Ds: 0.15, dFS: 0.012, sFS: 0.005, sig0: 0.48, horn:  0.11 },
+   '18': { dmax: 3.5, mu: 0.0160, Ds: 0.12, dFS: 0.013, sFS: 0.004, sig0: 0.53, horn:  0.13 },
 };
 
 const PCOLS     = ['#38bdf8', '#4ade80', '#fb923c', '#e879f9'];
@@ -319,7 +328,9 @@ function calcPDD(d, fs, E, ssd) {
     const t = d / dmax;
     return 100 * (Ds + (1 - Ds) * (3*t*t - 2*t*t*t));
   }
-  const scatter = 1 + 4e-4 * (fs - 10) * (d - dmax);
+  // Phantom scatter : augmente avec la taille de champ et la profondeur.
+  // Coefficient 1.5e-3 calibré pour reproduire la dépendance FS des PDD mesurées.
+  const scatter = 1 + 1.5e-3 * (fs - 10) * (d - dmax);
   const isl = ((ssd + dmax) / (ssd + d)) ** 2;
   return 100 * isl * Math.exp(-mu * (d - dmax)) * scatter;
 }
