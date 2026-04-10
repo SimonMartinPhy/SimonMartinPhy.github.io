@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebLinac — Physique des photons thérapeutiques</title>
+  <title>WebLinac</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -123,7 +123,7 @@
 
     /* ── PROFILES ── */
     .profiles-area { grid-area: profiles; }
-    .profiles-wrap { position: relative; height: 230px; }
+    .profiles-wrap { position: relative; height: 360px; }
 
     /* metrics table */
     .metrics-wrap { margin-top: 10px; overflow-x: auto; }
@@ -161,7 +161,9 @@
     <select id="energy">
       <option value="4">4 MV</option>
       <option value="6" selected>6 MV</option>
+      <option value="6fff">6 MV FFF</option>
       <option value="10">10 MV</option>
+      <option value="10fff">10 MV FFF</option>
       <option value="15">15 MV</option>
       <option value="18">18 MV</option>
     </select>
@@ -270,11 +272,13 @@ const SAD = 100; // Distance Source-Axe (isocentre), cm
  *  sFS  : augmentation de Ds par cm d'augmentation de FS
  */
 const BEAM = {
-   4: { dmax: 1.0, mu: 0.0560, Ds: 0.40, dFS: 0.006, sFS: 0.004, sig0: 0.28, horn: 0.03 },
-   6: { dmax: 1.5, mu: 0.0510, Ds: 0.32, dFS: 0.009, sFS: 0.006, sig0: 0.35, horn: 0.05 },
-  10: { dmax: 2.5, mu: 0.0450, Ds: 0.20, dFS: 0.011, sFS: 0.006, sig0: 0.42, horn: 0.08 },
-  15: { dmax: 3.0, mu: 0.0400, Ds: 0.15, dFS: 0.012, sFS: 0.005, sig0: 0.48, horn: 0.11 },
-  18: { dmax: 3.5, mu: 0.0380, Ds: 0.12, dFS: 0.013, sFS: 0.004, sig0: 0.53, horn: 0.13 },
+    '4': { dmax: 1.0, mu: 0.0560, Ds: 0.40, dFS: 0.006, sFS: 0.004, sig0: 0.28, horn:  0.03 },
+    '6': { dmax: 1.5, mu: 0.0510, Ds: 0.32, dFS: 0.009, sFS: 0.006, sig0: 0.35, horn:  0.05 },
+  '6fff': { dmax: 1.4, mu: 0.0505, Ds: 0.50, dFS: 0.007, sFS: 0.005, sig0: 0.36, horn: 0, sigma_fff: 10, fff: true },
+   '10': { dmax: 2.5, mu: 0.0450, Ds: 0.20, dFS: 0.011, sFS: 0.006, sig0: 0.42, horn:  0.08 },
+'10fff': { dmax: 2.4, mu: 0.0445, Ds: 0.60, dFS: 0.011, sFS: 0.005, sig0: 0.43, horn: 0, sigma_fff: 8, fff: true },
+   '15': { dmax: 3.0, mu: 0.0400, Ds: 0.15, dFS: 0.012, sFS: 0.005, sig0: 0.48, horn:  0.11 },
+   '18': { dmax: 3.5, mu: 0.0380, Ds: 0.12, dFS: 0.013, sFS: 0.004, sig0: 0.53, horn:  0.13 },
 };
 
 const PCOLS     = ['#38bdf8', '#4ade80', '#fb923c', '#e879f9'];
@@ -292,9 +296,11 @@ function erf(x) {
   return s * (1 - p * Math.exp(-a * a));
 }
 
-/** dmax effectif : diminue légèrement avec FS (plus de diffusé latéral) */
+/** dmax effectif : diminue légèrement avec FS (plus de diffusé latéral)
+ *  Pour les faisceaux FFF, dmax est indépendant de la taille de champ. */
 function getEffDmax(E, fs) {
-  const { dmax, dFS } = BEAM[E] ?? BEAM[6];
+  const { dmax, dFS, fff = false } = BEAM[E] ?? BEAM['6'];
+  if (fff) return dmax;
   return Math.max(0.5, dmax - dFS * (fs - 10));
 }
 
@@ -303,7 +309,7 @@ function getEffDmax(E, fs) {
  * fs = taille de champ À L'ISOCENTRE (DSA = 100 cm)
  */
 function calcPDD(d, fs, E, ssd) {
-  const { mu, Ds: Ds0, sFS } = BEAM[E] ?? BEAM[6];
+  const { mu, Ds: Ds0, sFS } = BEAM[E] ?? BEAM['6'];
   const dmax = getEffDmax(E, fs);
   // Dose de surface augmente avec FS (plus de diffusé = plus de contamination)
   const Ds = Math.max(0.08, Math.min(0.80, Ds0 + sFS * (fs - 10)));
@@ -328,14 +334,24 @@ function calcProfile(x, d, fs, E, ssd) {
   const a = (fs / 2) * (ssd + d) / SAD;
   // Sigma de pénombre : dépend de l'énergie, de la profondeur et de la taille de champ
   // (grand champ → plus de diffusé latéral → pénombre plus large)
-  const { sig0, horn } = BEAM[E] ?? BEAM[6];
+  const { sig0, horn, fff = false, sigma_fff = 10 } = BEAM[E] ?? BEAM['6'];
   const sig = sig0 + 0.012 * d + 0.004 * (fs - 10);
   const M = Math.SQRT2 * sig;
   const pen = 0.5 * (erf((a - x) / M) + erf((a + x) / M));
-  // Cornes (filtre égalisateur) : plus prononcées à haute énergie et à grand champ
-  const r = a > 0 ? Math.abs(x) / a : 0;
-  const hornEff = horn * Math.max(0.4, 1 + 0.025 * (fs - 10));
-  const horns = r < 1 ? (1 + hornEff * r * r) : 1.0;
+
+  let horns;
+  if (fff) {
+    // FFF : distribution Lorentzienne basée sur la distance hors-axe ramenée au plan source.
+    // x_src diminue avec la profondeur → inhomogénéité naturellement réduite en profondeur.
+    // Grande taille de champ → x_src grand → inhomogénéité plus prononcée, sans paramètre ad hoc.
+    const x_src = Math.abs(x) * SAD / (ssd + d);
+    horns = 1 / (1 + (x_src / sigma_fff) ** 2);
+  } else {
+    // FF : cornes quadratiques (r relatif), limitées à l'intérieur du champ
+    const r = a > 0 ? Math.abs(x) / a : 0;
+    const hornEff = horn * Math.max(0.4, 1 + 0.025 * (fs - 10));
+    horns = r < 1 ? (1 + hornEff * r * r) : 1.0;
+  }
   // Fuite hors champ
   return pen * horns + 0.018 * (1 - pen);
 }
@@ -531,7 +547,7 @@ function drawSchema(fs, E, ssd) {
 
   // Positions verticales (représentation compressée)
   const srcY  = 16;   // point source
-  const jawY  = 40;   // sortie mâchoires
+  const jawY  = 54;   // sortie mâchoires
   const surfY = 100;  // surface du fantôme (d = 0)
   const botY  = H - 10;
   const phantomPx = botY - surfY;
@@ -561,6 +577,13 @@ function drawSchema(fs, E, ssd) {
   const jawHalfPx = Math.min(cx - 6, (fs / 2) * JAW_DIST / SAD * scaleX);
   const lJaw = cx - jawHalfPx;
   const rJaw = cx + jawHalfPx;
+
+  // ── Filtre égalisateur — géométrie ──
+  const { horn, fff = false } = BEAM[E] ?? BEAM['6'];
+  const filterTopY   = srcY + 9;      // juste sous la source
+  const filterBotY   = jawY - 15;     // juste au-dessus des mâchoires
+  // Taille fixe = filtre dimensionné pour le champ maximum (30 cm), indépendant de fs
+  const filterBaseHalf = Math.min(cx - 14, (30 / 2) * JAW_DIST / SAD * scaleX);
 
   // Rayonnement absorbé par les mâchoires (triangles source → bords canvas → bord interne mâchoire)
   ctx.save();
@@ -648,6 +671,42 @@ function drawSchema(fs, E, ssd) {
   ctx.beginPath(); ctx.arc(cx, srcY, 7, 0, Math.PI * 2);
   ctx.fillStyle = grd; ctx.fill();
 
+  // ── Filtre égalisateur (absent en mode FFF) ──
+  ctx.save();
+  if (!fff) {
+    // Forme : trapèze (apex vers la source, base vers les mâchoires)
+    // La brillance centrale reflète l'atténuation maximale sur l'axe
+    const fGrad = ctx.createLinearGradient(cx - filterBaseHalf, 0, cx + filterBaseHalf, 0);
+    fGrad.addColorStop(0,    'rgba(60,70,95,.10)');
+    fGrad.addColorStop(0.30, 'rgba(130,145,175,.55)');
+    fGrad.addColorStop(0.50, 'rgba(205,220,245,.92)');
+    fGrad.addColorStop(0.70, 'rgba(130,145,175,.55)');
+    fGrad.addColorStop(1,    'rgba(60,70,95,.10)');
+    ctx.fillStyle = fGrad;
+    ctx.strokeStyle = 'rgba(200,215,240,.85)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 2, filterTopY);
+    ctx.lineTo(cx - filterBaseHalf, filterBotY);
+    ctx.lineTo(cx + filterBaseHalf, filterBotY);
+    ctx.lineTo(cx + 2, filterTopY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    // FFF : emplacement vide du filtre, contour en tirets
+    ctx.strokeStyle = 'rgba(251,146,60,.50)';
+    ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 2, filterTopY);
+    ctx.lineTo(cx - filterBaseHalf, filterBotY);
+    ctx.lineTo(cx + filterBaseHalf, filterBotY);
+    ctx.lineTo(cx + 2, filterTopY);
+    ctx.closePath();
+    ctx.stroke();
+  }
+  ctx.restore();
+
   // ── Mâchoires (ouverture calée sur la géométrie source-mâchoires) ──
   ctx.fillStyle = '#1e3a5f'; ctx.strokeStyle = '#2d5492'; ctx.lineWidth = 1;
   ctx.fillRect(5, jawY - 10, lJaw - 5, 12);
@@ -682,6 +741,26 @@ function drawSchema(fs, E, ssd) {
   // ── Labels ──
   ctx.fillStyle = '#8b949e'; ctx.font = '9px sans-serif';
   ctx.textAlign = 'right'; ctx.fillText('Source', cx - 10, srcY + 4);
+
+  // Filtre égalisateur — label
+  ctx.save();
+  const filterMidY = (filterTopY + filterBotY) / 2;
+  ctx.font = '8px sans-serif'; ctx.textAlign = 'right';
+  if (!fff) {
+    ctx.fillStyle = 'rgba(190,208,240,.80)';
+    ctx.fillText('Filtre éq.', cx - filterBaseHalf - 3, filterMidY + 3);
+    ctx.strokeStyle = 'rgba(190,208,240,.45)';
+  } else {
+    ctx.fillStyle = 'rgba(251,146,60,.85)';
+    ctx.fillText('FFF', cx - filterBaseHalf - 3, filterMidY + 3);
+    ctx.strokeStyle = 'rgba(251,146,60,.45)';
+  }
+  ctx.lineWidth = 0.5; ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(cx - filterBaseHalf - 2, filterMidY);
+  ctx.lineTo(cx - filterBaseHalf, filterMidY);
+  ctx.stroke();
+  ctx.restore();
 
   // DSP
   const ssdMid = (arrowTop + arrowBot) / 2;
@@ -867,7 +946,7 @@ function initPhantomHover() {
 
 function getParams() {
   return {
-    E:   parseInt(document.getElementById('energy').value),
+    E:   document.getElementById('energy').value,
     fs:  parseInt(document.getElementById('fieldSize').value),
     ssd: parseInt(document.getElementById('ssd').value),
   };
