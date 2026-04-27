@@ -83,8 +83,6 @@
     }
     @media (max-width: 980px) {
       .main { grid-template-columns: 1fr; grid-template-areas: "phantom" "pdd" "schema" "profiles"; }
-      .main-dosi { grid-template-columns: 1fr; }
-      .dosi-params-row { flex-wrap: wrap; }
     }
 
     /* ── CARDS ── */
@@ -221,6 +219,10 @@
     .calc-result .big { font-size: 20px; font-weight: 700; color: var(--accent); font-family: 'Courier New', monospace; }
     .det-info { font-size: 11px; color: var(--muted); line-height: 1.8; margin-top: 8px; }
     .det-info b { color: var(--text); }
+    @media (max-width: 980px) {
+      .main-dosi { grid-template-columns: 1fr; }
+      .dosi-params-row { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
