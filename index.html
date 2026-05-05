@@ -150,6 +150,16 @@
 
     footer { text-align: center; padding: 10px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); }
 
+    /* ── LANG SWITCHER ── */
+    .lang-switch { display: flex; gap: 3px; }
+    .lang-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 5px; padding: 3px 8px; font-size: 11px; font-weight: 700;
+      cursor: pointer; transition: color .15s, border-color .15s;
+    }
+    .lang-btn:hover:not(.active) { color: var(--text); border-color: var(--text); }
+    .lang-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(88,166,255,.10); }
+
     /* ── TABS ── */
     .tab-bar { background: var(--surf); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; gap: 2px; }
     .tab-btn {
@@ -230,21 +240,28 @@
 <div class="hdr">
   <div>
     <h1>WebLinac</h1>
-    <p>Simulation pédagogique simplifié d'un accélérateur linéaire médical</p>
+    <p data-i18n="subtitle">Simulation pédagogique simplifié d'un accélérateur linéaire médical</p>
   </div>
-  <span class="badge">Centre Oscar Lambret</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn"        onclick="setLang('en')">EN</button>
+      <button class="lang-btn"        onclick="setLang('nl')">NL</button>
+    </div>
+    <span class="badge">Centre Oscar Lambret</span>
+  </div>
 </div>
 
 <div class="tab-bar">
-  <button class="tab-btn active" data-tab="photons">Photons</button>
-  <button class="tab-btn"        data-tab="electrons">Électrons</button>
-  <button class="tab-btn"        data-tab="dosimetry">Dosimétrie</button>
+  <button class="tab-btn active" data-tab="photons"   data-i18n="tab_photons">Photons</button>
+  <button class="tab-btn"        data-tab="electrons"  data-i18n="tab_electrons">Électrons</button>
+  <button class="tab-btn"        data-tab="dosimetry"  data-i18n="tab_dosimetry">Dosimétrie</button>
 </div>
 
 <div id="panel-photons" class="tab-panel active">
 <div class="ctrls">
   <div class="ctrl">
-    <label>Énergie nominale</label>
+    <label data-i18n="lbl_nominal_energy">Énergie nominale</label>
     <select id="energy">
       <option value="4">4 MV</option>
       <option value="6" selected>6 MV</option>
@@ -256,21 +273,21 @@
     </select>
   </div>
   <div class="ctrl">
-    <label>Taille de champ </label>
+    <label data-i18n="lbl_field_size">Taille de champ</label>
     <div class="slider-row">
       <input type="range" id="fieldSize" min="2" max="30" step="1" value="10">
       <span class="sval" id="fs-disp">10 × 10 cm</span>
     </div>
   </div>
   <div class="ctrl">
-    <label>Distance Source-Surface (DSP)</label>
+    <label data-i18n="lbl_ssd">Distance Source-Surface (DSP)</label>
     <div class="slider-row">
       <input type="range" id="ssd" min="80" max="130" step="5" value="100">
       <span class="sval" id="ssd-disp">100 cm</span>
     </div>
   </div>
   <div class="ctrl">
-    <label>Profondeurs des profils</label>
+    <label data-i18n="lbl_profile_depths">Profondeurs des profils</label>
     <div class="depth-tbl" id="depth-tbl"></div>
   </div>
 </div>
@@ -279,7 +296,7 @@
 <div id="panel-electrons" class="tab-panel">
 <div class="ctrls">
   <div class="ctrl">
-    <label>Énergie nominale</label>
+    <label data-i18n="lbl_nominal_energy">Énergie nominale</label>
     <select id="e-energy">
       <option value="4">4 MeV</option>
       <option value="6" selected>6 MeV</option>
@@ -292,7 +309,7 @@
     </select>
   </div>
   <div class="ctrl">
-    <label>Applicateur</label>
+    <label data-i18n="lbl_applicator">Applicateur</label>
     <select id="e-appSize">
       <option value="6">6 × 6 cm</option>
       <option value="10" selected>10 × 10 cm</option>
@@ -302,7 +319,7 @@
     </select>
   </div>
   <div class="ctrl">
-    <label>Profondeurs des profils</label>
+    <label data-i18n="lbl_profile_depths">Profondeurs des profils</label>
     <div class="depth-tbl" id="e-depth-tbl"></div>
   </div>
 </div>
@@ -313,28 +330,28 @@
 
     <!-- ── Paramètres machine ── -->
     <div class="card" style="flex:1;min-width:0">
-      <div class="card-hdr">Paramètres machine</div>
+      <div class="card-hdr" data-i18n="lbl_machine_params">Paramètres machine</div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-start">
         <div class="ctrl">
-          <label>Type de faisceau</label>
+          <label data-i18n="lbl_beam_type">Type de faisceau</label>
           <select id="d-btype">
-            <option value="photons">Photons</option>
-            <option value="electrons">Électrons</option>
+            <option value="photons"   data-i18n="opt_photons">Photons</option>
+            <option value="electrons" data-i18n="opt_electrons">Électrons</option>
           </select>
         </div>
         <div class="ctrl">
-          <label>Énergie</label>
+          <label data-i18n="lbl_energy">Énergie</label>
           <select id="d-energy"></select>
         </div>
         <div class="ctrl" id="d-fs-ctrl">
-          <label>Taille de champ</label>
+          <label data-i18n="lbl_field_size">Taille de champ</label>
           <div class="slider-row">
             <input type="range" id="d-fs" min="2" max="30" step="1" value="10">
             <span class="sval" id="d-fs-disp">10 × 10 cm</span>
           </div>
         </div>
         <div class="ctrl" id="d-app-ctrl" style="display:none">
-          <label>Applicateur</label>
+          <label data-i18n="lbl_applicator">Applicateur</label>
           <select id="d-app">
             <option value="6">6 × 6 cm</option>
             <option value="10" selected>10 × 10 cm</option>
@@ -344,7 +361,7 @@
           </select>
         </div>
         <div class="ctrl">
-          <label>Nombre d'UM</label>
+          <label data-i18n="lbl_num_mu">Nombre d'UM</label>
           <div class="slider-row">
             <input type="number" id="d-mu" min="1" max="999" step="1" value="100" class="dnum" style="width:60px">
             <span class="dlabel">UM</span>
@@ -355,31 +372,31 @@
 
     <!-- ── Paramètres de mesure ── -->
     <div class="card" style="flex:1;min-width:0">
-      <div class="card-hdr">Paramètres de mesure</div>
+      <div class="card-hdr" data-i18n="lbl_meas_params">Paramètres de mesure</div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-start">
         <div class="ctrl">
-          <label>Profondeur</label>
+          <label data-i18n="lbl_depth">Profondeur</label>
           <div class="slider-row">
             <input type="number" id="d-depth" min="0" max="30" step="0.5" value="10" class="dnum" style="width:60px">
             <span class="dlabel">cm</span>
           </div>
         </div>
         <div class="ctrl" id="d-ssd-ctrl">
-          <label>Distance Source-Surface (DSP)</label>
+          <label data-i18n="lbl_ssd">Distance Source-Surface (DSP)</label>
           <div class="slider-row">
             <input type="range" id="d-ssd" min="80" max="120" step="5" value="100">
             <span class="sval" id="d-ssd-disp">100 cm</span>
           </div>
         </div>
         <div class="ctrl">
-          <label>Température</label>
+          <label data-i18n="lbl_temperature">Température</label>
           <div class="slider-row">
             <input type="number" id="d-temp" min="10" max="35" step="0.1" value="20" class="dnum-tp">
             <span class="dlabel" style="font-size:13px">°C</span>
           </div>
         </div>
         <div class="ctrl">
-          <label>Pression</label>
+          <label data-i18n="lbl_pressure">Pression</label>
           <div class="slider-row">
             <input type="number" id="d-pres" min="960" max="1060" step="0.1" value="1013" class="dnum-tp" style="width:82px">
             <span class="dlabel" style="font-size:13px">hPa</span>
@@ -394,7 +411,7 @@
 
     <!-- Détecteur -->
     <div class="card">
-      <div class="card-hdr">Détecteur</div>
+      <div class="card-hdr" data-i18n="lbl_detector">Détecteur</div>
       <div class="card-body">
         <select id="d-detector" style="width:100%;background:var(--surf2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;outline:none;margin-bottom:8px"></select>
         <div style="display:flex;justify-content:center;margin:6px 0">
@@ -406,22 +423,22 @@
 
     <!-- Électromètre -->
     <div class="card">
-      <div class="card-hdr">Électromètre</div>
+      <div class="card-hdr" data-i18n="lbl_electrometer">Électromètre</div>
       <div class="card-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
         <div class="electro-wrap" style="width:100%;max-width:360px">
-          <div style="font-size:9px;color:#3a6a3a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Charge collectée</div>
+          <div data-i18n="lbl_charge" style="font-size:9px;color:#3a6a3a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Charge collectée</div>
           <span class="electro-screen" id="electro-display">0.000</span>
           <div class="electro-unit">nC</div>
         </div>
         <div style="width:100%;max-width:360px">
-          <button class="zero-btn" onclick="zeroDosimetry()">⊘ Remise à zéro</button>
+          <button class="zero-btn" data-i18n="lbl_reset" onclick="zeroDosimetry()">⊘ Remise à zéro</button>
         </div>
       </div>
     </div>
 
     <!-- Schéma du dispositif -->
     <div class="card">
-      <div class="card-hdr">Schéma du dispositif</div>
+      <div class="card-hdr" data-i18n="lbl_setup_diagram">Schéma du dispositif</div>
       <div class="card-body" style="padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:10px">
         <canvas id="dosi-schema-cv" width="308" height="326" style="display:block;border-radius:4px"></canvas>
         <div class="mu-screen" style="width:100%;max-width:308px;text-align:center">UM : <span id="mu-counter">0</span> / <span id="mu-total">100</span></div>
@@ -434,14 +451,14 @@
   <!-- Tableau kQ,Q0 -->
   <div style="padding:0 20px 16px">
     <div class="card">
-      <div class="card-hdr">Facteurs de qualité kQ,Q0 — référence Co-60 &nbsp;<span style="font-size:10px;font-weight:400;color:var(--muted)">(TRS 398 — la cellule active est surlignée)</span></div>
+      <div class="card-hdr"><span data-i18n="lbl_kq_title">Facteurs de qualité kQ,Q0 — référence Co-60</span> &nbsp;<span style="font-size:10px;font-weight:400;color:var(--muted)" data-i18n="lbl_kq_note">(TRS 398 — la cellule active est surlignée)</span></div>
       <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
         <div style="flex:1;min-width:280px">
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Photons</div>
+          <div data-i18n="opt_photons" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Photons</div>
           <table class="kq-table" id="kq-photons-table"></table>
         </div>
         <div style="flex:1;min-width:300px">
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Électrons</div>
+          <div data-i18n="opt_electrons" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Électrons</div>
           <table class="kq-table" id="kq-electrons-table"></table>
         </div>
       </div>
@@ -454,10 +471,10 @@
 
   <!-- 2D DOSE MAP -->
   <div class="card phantom-area">
-    <div class="card-hdr">Distribution de dose 2D<span id="dmax-info"></span></div>
+    <div class="card-hdr"><span data-i18n="lbl_2d_dose">Distribution de dose 2D</span><span id="dmax-info"></span></div>
     <div class="card-body">
       <div class="phantom-inner">
-        <span class="ph-depth-lbl">Profondeur (cm)</span>
+        <span class="ph-depth-lbl" data-i18n="lbl_depth_cm">Profondeur (cm)</span>
         <div class="phantom-wrap">
           <canvas id="phantom-cv" width="296" height="340"></canvas>
           <div class="htip" id="htip"></div>
@@ -474,10 +491,10 @@
 
   <!-- PDD -->
   <div class="card pdd-area">
-    <div class="card-hdr">Rendement en profondeur (PDD) — axe central</div>
+    <div class="card-hdr" data-i18n="lbl_pdd">Rendement en profondeur (PDD) — axe central</div>
     <div class="card-body">
       <div class="chart-wrap"><canvas id="pdd-cv"></canvas></div>
-      <p style="margin-top:8px;font-size:11px;color:var(--muted)">
+      <p data-i18n-html="lbl_pdd_note" style="margin-top:8px;font-size:11px;color:var(--muted)">
         Dose normalisée à d<sub>max</sub> = 100 % · trait pointillé jaune = d<sub>max</sub>
       </p>
     </div>
@@ -485,7 +502,7 @@
 
   <!-- SCHÉMA -->
   <div class="card schema-area">
-    <div class="card-hdr">Schéma du dispositif</div>
+    <div class="card-hdr" data-i18n="lbl_setup_diagram">Schéma du dispositif</div>
     <div class="card-body" style="padding:10px 8px;">
       <canvas id="schema-cv" width="140" height="326"></canvas>
     </div>
@@ -493,17 +510,17 @@
 
   <!-- PROFILES -->
   <div class="card profiles-area">
-    <div class="card-hdr">Profils de dose transversaux</div>
+    <div class="card-hdr" data-i18n="lbl_profiles">Profils de dose transversaux</div>
     <div class="card-body">
       <div class="profiles-wrap"><canvas id="prof-cv"></canvas></div>
       <div class="metrics-wrap">
         <table class="metrics-tbl">
           <thead id="metrics-head">
             <tr>
-              <th>Profondeur</th>
-              <th>Taille de champ D<sub>50%</sub></th>
-              <th>Pénombre 20–80 %</th>
-              <th>Taille géom. à l'iso (FS × (DSP+d)/100)</th>
+              <th data-i18n="th_depth">Profondeur</th>
+              <th data-i18n-html="th_field_size">Taille de champ D<sub>50%</sub></th>
+              <th data-i18n="th_penumbra">Pénombre 20–80 %</th>
+              <th data-i18n="th_geom">Taille géom. à l'iso (FS × (DSP+d)/100)</th>
             </tr>
           </thead>
           <tbody id="metrics-body"></tbody>
@@ -514,10 +531,229 @@
 
 </div>
 
-<footer>WebLinac — outil pédagogique de physique médicale · modèle analytique simplifié — Simon MARTIN </footer>
+<footer data-i18n="footer">WebLinac — outil pédagogique de physique médicale · modèle analytique simplifié — Simon MARTIN </footer>
 
 <script>
 'use strict';
+
+// ═══════════════════════════════════════════════════════
+//  INTERNATIONALISATION (FR / EN / NL)
+// ═══════════════════════════════════════════════════════
+
+const TRANSLATIONS = {
+  fr: {
+    subtitle:        "Simulation pédagogique simplifié d'un accélérateur linéaire médical",
+    tab_photons:     "Photons",
+    tab_electrons:   "Électrons",
+    tab_dosimetry:   "Dosimétrie",
+    lbl_nominal_energy: "Énergie nominale",
+    lbl_field_size:  "Taille de champ",
+    lbl_ssd:         "Distance Source-Surface (DSP)",
+    lbl_profile_depths: "Profondeurs des profils",
+    lbl_applicator:  "Applicateur",
+    lbl_machine_params: "Paramètres machine",
+    lbl_beam_type:   "Type de faisceau",
+    lbl_energy:      "Énergie",
+    lbl_num_mu:      "Nombre d'UM",
+    lbl_meas_params: "Paramètres de mesure",
+    lbl_depth:       "Profondeur",
+    lbl_temperature: "Température",
+    lbl_pressure:    "Pression",
+    lbl_detector:    "Détecteur",
+    lbl_electrometer:"Électromètre",
+    lbl_charge:      "Charge collectée",
+    lbl_reset:       "⊘ Remise à zéro",
+    lbl_setup_diagram:"Schéma du dispositif",
+    lbl_kq_title:    "Facteurs de qualité kQ,Q0 — référence Co-60",
+    lbl_kq_note:     "(TRS 398 — la cellule active est surlignée)",
+    lbl_2d_dose:     "Distribution de dose 2D",
+    lbl_depth_cm:    "Profondeur (cm)",
+    lbl_pdd:         "Rendement en profondeur (PDD) — axe central",
+    lbl_pdd_note:    "Dose normalisée à d<sub>max</sub> = 100 % · trait pointillé jaune = d<sub>max</sub>",
+    lbl_profiles:    "Profils de dose transversaux",
+    footer:          "WebLinac — outil pédagogique de physique médicale · modèle analytique simplifié — Simon MARTIN",
+    th_depth:        "Profondeur",
+    th_field_size:   "Taille de champ D<sub>50%</sub>",
+    th_penumbra:     "Pénombre 20–80 %",
+    th_geom:         "Taille géom. à l'iso (FS × (DSP+d)/100)",
+    th_flatness:     "Platéité IEC (central 80 %)",
+    th_chamber:      "Chambre / N<sub>D,w</sub>",
+    det_model:       "Modèle :",
+    det_volume:      "Volume actif :",
+    det_shape:       "Forme :",
+    det_shape_cyl:   "Cylindrique",
+    det_shape_pp:    "Plan-parallèle",
+    det_calib:       "Étalonnée dans l'eau, Co-60 — T<sub>0</sub> = 20,0 °C, P<sub>0</sub> = 1013,25 hPa",
+    chart_depth:     "Profondeur (cm)",
+    chart_dose:      "Dose (%)",
+    chart_lateral:   "Position latérale (cm)",
+    tooltip_depth:   "Profondeur",
+    tooltip_pos:     "Position",
+    canvas_source:   "Source",
+    canvas_phantom:  "Fantôme d'eau",
+    canvas_ssd:      "DSP",
+    canvas_ref_ssd:  "DSD réf",
+    canvas_zref:     "z_réf",
+    canvas_cavity:   "Cavité active",
+    canvas_electrode:"Électrode",
+    canvas_axial:    "Vue axiale ⊥ faisceau",
+    chip_surface:    "Dose surface",
+    opt_photons:     "Photons",
+    opt_electrons:   "Électrons",
+  },
+  en: {
+    subtitle:        "Simplified educational simulation of a medical linear accelerator",
+    tab_photons:     "Photons",
+    tab_electrons:   "Electrons",
+    tab_dosimetry:   "Dosimetry",
+    lbl_nominal_energy: "Nominal energy",
+    lbl_field_size:  "Field size",
+    lbl_ssd:         "Source-Surface Distance (SSD)",
+    lbl_profile_depths: "Profile depths",
+    lbl_applicator:  "Applicator",
+    lbl_machine_params: "Machine parameters",
+    lbl_beam_type:   "Beam type",
+    lbl_energy:      "Energy",
+    lbl_num_mu:      "Number of MU",
+    lbl_meas_params: "Measurement parameters",
+    lbl_depth:       "Depth",
+    lbl_temperature: "Temperature",
+    lbl_pressure:    "Pressure",
+    lbl_detector:    "Detector",
+    lbl_electrometer:"Electrometer",
+    lbl_charge:      "Collected charge",
+    lbl_reset:       "⊘ Reset",
+    lbl_setup_diagram:"Setup diagram",
+    lbl_kq_title:    "Quality factors kQ,Q0 — Co-60 reference",
+    lbl_kq_note:     "(TRS 398 — active cell is highlighted)",
+    lbl_2d_dose:     "2D dose distribution",
+    lbl_depth_cm:    "Depth (cm)",
+    lbl_pdd:         "Percentage Depth Dose (PDD) — central axis",
+    lbl_pdd_note:    "Dose normalized to d<sub>max</sub> = 100 % · yellow dashed line = d<sub>max</sub>",
+    lbl_profiles:    "Transverse dose profiles",
+    footer:          "WebLinac — medical physics educational tool · simplified analytical model — Simon MARTIN",
+    th_depth:        "Depth",
+    th_field_size:   "Field size D<sub>50%</sub>",
+    th_penumbra:     "Penumbra 20–80 %",
+    th_geom:         "Geom. size at iso (FS × (SSD+d)/100)",
+    th_flatness:     "IEC flatness (central 80 %)",
+    th_chamber:      "Chamber / N<sub>D,w</sub>",
+    det_model:       "Model:",
+    det_volume:      "Active volume:",
+    det_shape:       "Shape:",
+    det_shape_cyl:   "Cylindrical",
+    det_shape_pp:    "Plane-parallel",
+    det_calib:       "Calibrated in water, Co-60 — T<sub>0</sub> = 20.0 °C, P<sub>0</sub> = 1013.25 hPa",
+    chart_depth:     "Depth (cm)",
+    chart_dose:      "Dose (%)",
+    chart_lateral:   "Lateral position (cm)",
+    tooltip_depth:   "Depth",
+    tooltip_pos:     "Position",
+    canvas_source:   "Source",
+    canvas_phantom:  "Water phantom",
+    canvas_ssd:      "SSD",
+    canvas_ref_ssd:  "Ref SSD",
+    canvas_zref:     "z_ref",
+    canvas_cavity:   "Active cavity",
+    canvas_electrode:"Electrode",
+    canvas_axial:    "Axial view ⊥ beam",
+    chip_surface:    "Surface dose",
+    opt_photons:     "Photons",
+    opt_electrons:   "Electrons",
+  },
+  nl: {
+    subtitle:        "Vereenvoudigde educatieve simulatie van een medische lineaire versneller",
+    tab_photons:     "Fotonen",
+    tab_electrons:   "Elektronen",
+    tab_dosimetry:   "Dosimetrie",
+    lbl_nominal_energy: "Nominale energie",
+    lbl_field_size:  "Veldgrootte",
+    lbl_ssd:         "Bron-Oppervlak Afstand (BOA)",
+    lbl_profile_depths: "Profieldiepten",
+    lbl_applicator:  "Applicator",
+    lbl_machine_params: "Machine parameters",
+    lbl_beam_type:   "Stralentype",
+    lbl_energy:      "Energie",
+    lbl_num_mu:      "Aantal MU",
+    lbl_meas_params: "Meetparameters",
+    lbl_depth:       "Diepte",
+    lbl_temperature: "Temperatuur",
+    lbl_pressure:    "Druk",
+    lbl_detector:    "Detector",
+    lbl_electrometer:"Elektrometer",
+    lbl_charge:      "Verzamelde lading",
+    lbl_reset:       "⊘ Nulstellen",
+    lbl_setup_diagram:"Opstelling schema",
+    lbl_kq_title:    "Kwaliteitsfactoren kQ,Q0 — Co-60 referentie",
+    lbl_kq_note:     "(TRS 398 — actieve cel is gemarkeerd)",
+    lbl_2d_dose:     "2D-dosisverdeling",
+    lbl_depth_cm:    "Diepte (cm)",
+    lbl_pdd:         "Percentage Dieptedosis (PDD) — centrale as",
+    lbl_pdd_note:    "Dosis genormaliseerd op d<sub>max</sub> = 100 % · gele stippellijn = d<sub>max</sub>",
+    lbl_profiles:    "Transversale dosisprofielen",
+    footer:          "WebLinac — educatief hulpmiddel medische fysica · vereenvoudigd analytisch model — Simon MARTIN",
+    th_depth:        "Diepte",
+    th_field_size:   "Veldgrootte D<sub>50%</sub>",
+    th_penumbra:     "Penumbra 20–80 %",
+    th_geom:         "Geom. grootte bij iso (FS × (BOA+d)/100)",
+    th_flatness:     "IEC vlakheid (centrale 80 %)",
+    th_chamber:      "Kamer / N<sub>D,w</sub>",
+    det_model:       "Model:",
+    det_volume:      "Actief volume:",
+    det_shape:       "Vorm:",
+    det_shape_cyl:   "Cilindrisch",
+    det_shape_pp:    "Vlak-parallel",
+    det_calib:       "Gekalibreerd in water, Co-60 — T<sub>0</sub> = 20,0 °C, P<sub>0</sub> = 1013,25 hPa",
+    chart_depth:     "Diepte (cm)",
+    chart_dose:      "Dosis (%)",
+    chart_lateral:   "Laterale positie (cm)",
+    tooltip_depth:   "Diepte",
+    tooltip_pos:     "Positie",
+    canvas_source:   "Bron",
+    canvas_phantom:  "Waterphantoom",
+    canvas_ssd:      "BOA",
+    canvas_ref_ssd:  "Ref BOA",
+    canvas_zref:     "z_ref",
+    canvas_cavity:   "Actieve holte",
+    canvas_electrode:"Elektrode",
+    canvas_axial:    "Axiale weergave ⊥ straal",
+    chip_surface:    "Oppervlaktedosis",
+    opt_photons:     "Fotonen",
+    opt_electrons:   "Elektronen",
+  }
+};
+
+let currentLang = 'fr';
+const T = key => TRANSLATIONS[currentLang][key] ?? key;
+
+function setLang(lang) {
+  currentLang = lang;
+  // Update active button
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+  // Update static elements with data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = T(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = T(el.dataset.i18nHtml);
+  });
+  // Update Chart.js axis titles
+  if (chartPDD) {
+    chartPDD.options.scales.x.title.text = T('chart_depth');
+    chartPDD.options.scales.y.title.text = T('chart_dose');
+    chartPDD.update('none');
+  }
+  if (chartProf) {
+    chartProf.options.scales.x.title.text = T('chart_lateral');
+    chartProf.options.scales.y.title.text = T('chart_dose');
+    chartProf.update('none');
+  }
+  // Re-render everything so canvas labels and JS-generated HTML update
+  refresh();
+  if (activeTab === 'dosimetry') refreshDosimetry();
+}
 
 // ═══════════════════════════════════════════════════════
 //  DOSIMÉTRIE PONCTUELLE
@@ -758,7 +994,7 @@ function drawDosimetrySchema(btype, E, fs, ssd, depth) {
     ctx.save(); ctx.strokeStyle = '#fbbf24'; ctx.setLineDash([4,3]); ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(5,zrefY); ctx.lineTo(W-5,zrefY); ctx.stroke();
     ctx.fillStyle = '#fbbf24'; ctx.font = '7px sans-serif'; ctx.textAlign = 'left'; ctx.setLineDash([]);
-    ctx.fillText(`z_réf = ${z_ref.toFixed(1)} cm`, 7, zrefY - 2); ctx.restore();
+    ctx.fillText(`${T('canvas_zref')} = ${z_ref.toFixed(1)} cm`, 7, zrefY - 2); ctx.restore();
   }
 
   // Profondeur de mesure + représentation réaliste du détecteur
@@ -787,21 +1023,21 @@ function drawDosimetrySchema(btype, E, fs, ssd, depth) {
   ctx.beginPath(); ctx.moveTo(ax-3,arrowBot-5); ctx.lineTo(ax,arrowBot); ctx.lineTo(ax+3,arrowBot-5); ctx.stroke();
   const ssdMid = (arrowTop + arrowBot) / 2;
   ctx.fillStyle = '#8b949e'; ctx.font = '7px sans-serif'; ctx.textAlign = 'right';
-  ctx.fillText('DSP', ax-4, ssdMid-2);
+  ctx.fillText(T('canvas_ssd'), ax-4, ssdMid-2);
   ctx.fillStyle = '#58a6ff'; ctx.font = 'bold 7px sans-serif';
   ctx.fillText(`${ssdEff} cm`, ax-4, ssdMid+8);
   // Pour les photons : rappel DSD = DSP + z_réf = 100 cm
   if (btype !== 'electrons') {
     const dsdVal = ssdEff + 10;
     ctx.fillStyle = 'rgba(251,191,36,.55)'; ctx.font = '6px sans-serif';
-    ctx.fillText(`DSD réf = ${dsdVal} cm`, ax-4, ssdMid+18);
+    ctx.fillText(`${T('canvas_ref_ssd')} = ${dsdVal} cm`, ax-4, ssdMid+18);
   }
 
   // Labels divers
   ctx.fillStyle = '#8b949e'; ctx.font = '8px sans-serif'; ctx.textAlign = 'right';
-  ctx.fillText('Source', cx-8, srcY+4);
+  ctx.fillText(T('canvas_source'), cx-8, srcY+4);
   ctx.fillStyle = 'rgba(59,130,246,.55)'; ctx.font = '7px sans-serif'; ctx.textAlign = 'left';
-  ctx.fillText("Fantôme d'eau", 7, surfY+36);
+  ctx.fillText(T('canvas_phantom'), 7, surfY+36);
   ctx.fillStyle = 'rgba(255,255,255,.40)'; ctx.font = '7px sans-serif'; ctx.textAlign = 'center';
   ctx.fillText(`${((fs/2)*ssdEff/SAD*2).toFixed(1)} cm`, cx, surfY+14);
   ctx.fillStyle = 'rgba(139,148,158,.48)'; ctx.font = '7px sans-serif'; ctx.textAlign = 'left';
@@ -870,11 +1106,11 @@ function drawDetectorSchema(det) {
 
     // Labels
     ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Cavité active', cx, cy + Rout + 16);
+    ctx.fillText(T('canvas_cavity'), cx, cy + Rout + 16);
     ctx.fillStyle = 'rgba(253,230,138,.85)'; ctx.font = '9px sans-serif';
-    ctx.fillText('Électrode', cx, cy + rEl + 11);
+    ctx.fillText(T('canvas_electrode'), cx, cy + rEl + 11);
     ctx.fillStyle = 'rgba(200,210,230,.50)'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText('Vue axiale ⊥ faisceau', W - 4, H - 4);
+    ctx.fillText(T('canvas_axial'), W - 4, H - 4);
 
   } else {
     // Plan-parallèle : coupe sagittale dans le sens du faisceau
@@ -933,11 +1169,11 @@ function updateDetectorInfo() {
   const mant   = (ndwGpC / Math.pow(10, exp)).toFixed(2);
   const ndwStr = `${mant} × 10<sup>${exp}</sup> Gy/C`;
   document.getElementById('det-info').innerHTML =
-    `<b>Modèle :</b> ${det.model}<br>` +
-    `<b>Volume actif :</b> ${det.volume} cm³<br>` +
-    `<b>Forme :</b> ${det.shape === 'cyl' ? 'Cylindrique' : 'Plan-parallèle'}<br>` +
+    `<b>${T('det_model')}</b> ${det.model}<br>` +
+    `<b>${T('det_volume')}</b> ${det.volume} cm³<br>` +
+    `<b>${T('det_shape')}</b> ${det.shape === 'cyl' ? T('det_shape_cyl') : T('det_shape_pp')}<br>` +
     `<b>N<sub>D,w,Q0</sub> (Co-60) :</b> ${ndwStr}<br>` +
-    `<i style="color:var(--muted)">Étalonnée dans l'eau, Co-60 — T<sub>0</sub> = 20,0 °C, P<sub>0</sub> = 1013,25 hPa</i>`;
+    `<i style="color:var(--muted)">${T('det_calib')}</i>`;
   drawDetectorSchema(det);
 }
 
@@ -1017,7 +1253,7 @@ function renderKQTable() {
   function buildTable(tableId, energies, qMode) {
     const tbl = document.getElementById(tableId);
     if (!tbl) return;
-    let html = '<thead><tr><th>Chambre / N<sub>D,w</sub></th>';
+    let html = `<thead><tr><th>${T('th_chamber')}</th>`;
     energies.forEach(e => { html += `<th>${e.label}</th>`; });
     html += '</tr></thead><tbody>';
     DETECTORS.forEach((det, di) => {
@@ -1972,13 +2208,13 @@ function initCharts() {
     options: {
       animation: false, responsive: true, maintainAspectRatio: false,
       scales: {
-        x: { type: 'linear', min: 0, max: 30, title: { display: true, text: 'Profondeur (cm)', color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } },
-        y: { type: 'linear', min: 0, max: 110, title: { display: true, text: 'Dose (%)', color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } }
+        x: { type: 'linear', min: 0, max: 30, title: { display: true, text: T('chart_depth'), color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } },
+        y: { type: 'linear', min: 0, max: 110, title: { display: true, text: T('chart_dose'), color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } }
       },
       plugins: {
         legend: { display: false },
         tooltip: { callbacks: {
-          title: c => `Profondeur : ${(+c[0].parsed.x).toFixed(1)} cm`,
+          title: c => `${T('tooltip_depth')} : ${(+c[0].parsed.x).toFixed(1)} cm`,
           label:  c => `PDD = ${(+c.parsed.y).toFixed(1)} %`,
         }}
       }
@@ -1991,13 +2227,13 @@ function initCharts() {
     options: {
       animation: false, responsive: true, maintainAspectRatio: false,
       scales: {
-        x: { type: 'linear', title: { display: true, text: 'Position latérale (cm)', color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } },
-        y: { type: 'linear', min: 0, max: 115, title: { display: true, text: 'Dose (%)', color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } }
+        x: { type: 'linear', title: { display: true, text: T('chart_lateral'), color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } },
+        y: { type: 'linear', min: 0, max: 115, title: { display: true, text: T('chart_dose'), color: TICK_C, font: { size: 11 } }, grid: { color: GRID_C }, ticks: { color: TICK_C } }
       },
       plugins: {
         legend: { display: true, labels: { color: '#c9d1d9', boxWidth: 20, font: { size: 11 } } },
         tooltip: { mode: 'index', intersect: false, callbacks: {
-          title: c => `Position : ${(+c[0].parsed.x).toFixed(1)} cm`,
+          title: c => `${T('tooltip_pos')} : ${(+c[0].parsed.x).toFixed(1)} cm`,
           label:  c => `${c.dataset.label} : ${(+c.parsed.y).toFixed(1)} %`,
         }}
       }
@@ -2053,8 +2289,8 @@ function updateElectronProfilesChart(fs, Emev) {
 
 function updateMetrics(fs, E, ssd) {
   document.getElementById('metrics-head').innerHTML = `<tr>
-    <th>Profondeur</th><th>Taille de champ D<sub>50%</sub></th>
-    <th>Pénombre 20–80 %</th><th>Taille géom. à l'iso (FS × (DSP+d)/100)</th></tr>`;
+    <th>${T('th_depth')}</th><th>${T('th_field_size')}</th>
+    <th>${T('th_penumbra')}</th><th>${T('th_geom')}</th></tr>`;
   document.getElementById('metrics-body').innerHTML =
     getDepths().map((d, i) => {
       const m = calcMetrics(d, fs, E, ssd);
@@ -2070,8 +2306,8 @@ function updateMetrics(fs, E, ssd) {
 function updateElectronMetrics(fs, Emev) {
   const p = EBEAM[Emev] ?? EBEAM['6'];
   document.getElementById('metrics-head').innerHTML = `<tr>
-    <th>Profondeur</th><th>Taille de champ D<sub>50%</sub></th>
-    <th>Pénombre 20–80 %</th><th>Platéité IEC (central 80%)</th></tr>`;
+    <th>${T('th_depth')}</th><th>${T('th_field_size')}</th>
+    <th>${T('th_penumbra')}</th><th>${T('th_flatness')}</th></tr>`;
   document.getElementById('metrics-body').innerHTML =
     getDepths().map((d, i) => {
       const m = calcElectronMetrics(d, fs, Emev);
@@ -2168,7 +2404,7 @@ function updateElectronDisplays() {
     `<span class="chip">d<sub>max</sub> = <b>${p.dmax} cm</b></span>` +
     `<span class="chip">R<sub>50</sub> = <b>${p.r50} cm</b></span>` +
     `<span class="chip">R<sub>p</sub> = <b>${p.rp} cm</b></span>` +
-    `<span class="chip">Dose surface = <b>${(p.Ds*100).toFixed(0)} %</b></span>`;
+    `<span class="chip">${T('chip_surface')} = <b>${(p.Ds*100).toFixed(0)} %</b></span>`;
 }
 
 /** Pré-règle les profondeurs électrons sur dmax, R50, 0.8×Rp */
