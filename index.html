@@ -1287,7 +1287,8 @@ function renderKQTable() {
     DETECTORS.forEach((det, di) => {
       const rowActive = di === detIdx;
       html += `<tr class="${rowActive ? 'det-active' : ''}">`;
-      html += `<td class="det-name">${det.model}<br><span style="color:var(--muted);font-size:10px;font-weight:400">${det.ndw} cGy/nC</span></td>`;
+      const shapeLbl = det.shape === 'cyl' ? T('det_shape_cyl') : T('det_shape_pp');
+      html += `<td class="det-name">${shapeLbl}<br><span style="color:var(--muted);font-size:10px;font-weight:400">${det.volume} cm³ — ${det.ndw} cGy/nC</span></td>`;
       energies.forEach(e => {
         const val = det.kQ[qMode][e.key];
         const cellActive = rowActive && qMode === (btype === 'electrons' ? 'electrons' : 'photons') && e.key === E;
@@ -1301,6 +1302,14 @@ function renderKQTable() {
 
   buildTable('kq-photons-table',   PHOTON_E, 'photons');
   buildTable('kq-electrons-table', ELEC_E,   'electrons');
+
+  // Mise à jour des libellés du sélecteur selon la langue courante
+  const detSel = document.getElementById('d-detector');
+  DETECTORS.forEach((d, i) => {
+    if (detSel.options[i]) {
+      detSel.options[i].textContent = `${d.shape === 'cyl' ? T('det_shape_cyl') : T('det_shape_pp')} — ${d.volume} cm³`;
+    }
+  });
 }
 
 function refreshDosimetry() {
